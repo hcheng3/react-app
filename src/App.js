@@ -1,23 +1,43 @@
-import logo from './logo.svg';
+import React,{ useState } from 'react'
 import './App.css';
+import Header from './components/Header';
+import Mainboard from './components/Mainboard';
+import unsplash from './api/unsplash';
 
 function App() {
+  const [pins, setNewPins] = useState([])
+  
+  const getImages = (term) =>{
+    return unsplash.get("https://api.unsplash.com/search/photos",{
+      params:{
+        query: term
+      }
+    });
+  };
+
+  const onSearchSubmit = (term) => {
+    getImages(term).then((res) =>{
+      // console.log(res);
+      let results = res.data.results;
+      let newPins = [
+        ...results,
+        ...pins,
+      ]
+
+      newPins.sort(function(a,b){
+        return 0.5 - Math.random();
+      });
+      
+      setNewPins(newPins);
+    })
+  };
+
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <Header onSubmit ={onSearchSubmit}/>
+      <Mainboard pins = {pins}/>
     </div>
   );
 }
